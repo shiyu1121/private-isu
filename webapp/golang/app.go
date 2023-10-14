@@ -174,12 +174,17 @@ func getFlash(w http.ResponseWriter, r *http.Request, key string) string {
 func makePosts(results []Post, csrfToken string, allComments bool) ([]Post, error) {
 	var posts []Post
 
+	// 投稿リストresultについてfor文を回す
 	for _, p := range results {
+		// 各投稿に対して、コメントの総数を取得
 		err := db.Get(&p.CommentCount, "SELECT COUNT(*) AS `count` FROM `comments` WHERE `post_id` = ?", p.ID)
 		if err != nil {
 			return nil, err
 		}
+		
 
+		// コメントを取得し、コメントオブジェクトを投稿に関連付ける。
+		// コメントは作成日時の降順でソートされる。
 		query := "SELECT * FROM `comments` WHERE `post_id` = ? ORDER BY `created_at` DESC"
 		if !allComments {
 			query += " LIMIT 3"
@@ -190,6 +195,8 @@ func makePosts(results []Post, csrfToken string, allComments bool) ([]Post, erro
 			return nil, err
 		}
 
+		// usersテーブルにクエリする
+		// ユーザー情報を取得し、コメントオブジェクトに設定
 		for i := 0; i < len(comments); i++ {
 			err := db.Get(&comments[i].User, "SELECT * FROM `users` WHERE `id` = ?", comments[i].UserID)
 			if err != nil {
@@ -197,20 +204,25 @@ func makePosts(results []Post, csrfToken string, allComments bool) ([]Post, erro
 			}
 		}
 
-		// reverse
+		// コメントを逆順にソート
 		for i, j := 0, len(comments)-1; i < j; i, j = i+1, j-1 {
 			comments[i], comments[j] = comments[j], comments[i]
 		}
 
+		// コメントを投稿オブジェクトに設定
 		p.Comments = comments
 
+		// 投稿に関連するユーザー情報を取得し、投稿オブジェクトに設定。
 		err = db.Get(&p.User, "SELECT * FROM `users` WHERE `id` = ?", p.UserID)
 		if err != nil {
 			return nil, err
 		}
 
+		// CSRFトークンを投稿オブジェクトに設定
 		p.CSRFToken = csrfToken
 
+		// ユーザーの削除フラグが0の場合、投稿オブジェクトを結果のリストに追加する。
+		// ただし、一度に追加する投稿の数は"postsPerPage"で制御されており、この数以上の投稿を処理しない。
 		if p.User.DelFlg == 0 {
 			posts = append(posts, p)
 		}
