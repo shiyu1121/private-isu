@@ -1,0 +1,84 @@
+Reading from STDIN ...
+
+# 2s user time, 50ms system time, 1.00k rss, 35.00k vsz
+# Current date: Sun Oct 22 06:10:58 2023
+# Hostname: c8dcd9826085
+# Files: STDIN
+# Overall: 42.70k total, 25 unique, 238.57 QPS, 0.39x concurrency ________
+# Time range: 2023-09-18T10:18:15 to 2023-09-18T10:21:14
+# Attribute          total     min     max     avg     95%  stddev  median
+# ============     ======= ======= ======= ======= ======= ======= =======
+# Exec time            69s     1us    27ms     2ms    19ms     5ms    22us
+# Lock time            6ms       0    12us       0     1us       0       0
+# Rows sent        984.91k       0   9.78k   23.62    0.99  459.43       0
+# Rows examine     462.45M       0  97.69k  11.09k  97.04k  30.71k       0
+# Query size         9.04M      28   1.12M  221.86   80.10  13.04k   31.70
+
+# Profile
+# Rank Query ID                            Response time Calls R/Call V/M 
+# ==== =================================== ============= ===== ====== ====
+#    1 0x624863D30DAC59FA16849282195BE09F  47.3668 68.4%  2354 0.0201  0.00 SELECT comments
+#    2 0x422390B42D4DD86C7539A5F45EB76A80  18.8097 27.2%  2388 0.0079  0.00 SELECT comments
+# MISC 0xMISC                               3.0930  4.5% 37962 0.0001   0.0 <23 ITEMS>
+
+# Query 1: 13.69 QPS, 0.28x concurrency, ID 0x624863D30DAC59FA16849282195BE09F at byte 859828
+# This item is included in the report because it matches --limit.
+# Scores: V/M = 0.00
+# Time range: 2023-09-18T10:18:21 to 2023-09-18T10:21:13
+# Attribute    pct   total     min     max     avg     95%  stddev  median
+# ============ === ======= ======= ======= ======= ======= ======= =======
+# Count          5    2354
+# Exec time     68     47s    19ms    24ms    20ms    20ms   535us    20ms
+# Lock time     15   982us       0    12us       0     1us       0       0
+# Rows sent      0   5.58k       0       3    2.43    2.90    1.14    2.90
+# Rows examine  48 224.52M  97.66k  97.67k  97.67k  97.04k       0  97.04k
+# Query size     2 189.01k      80      83   82.22   80.10    0.16   80.10
+# String:
+# Databases    isuconp
+# Hosts        webapp-app-1.webapp_default
+# Users        root
+# Query_time distribution
+#   1us
+#  10us
+# 100us
+#   1ms
+#  10ms  ################################################################
+# 100ms
+#    1s
+#  10s+
+# Tables
+#    SHOW TABLE STATUS FROM `isuconp` LIKE 'comments'\G
+#    SHOW CREATE TABLE `isuconp`.`comments`\G
+# EXPLAIN /*!50100 PARTITIONS*/
+SELECT * FROM `comments` WHERE `post_id` = 10001 ORDER BY `created_at` DESC LIMIT 3\G
+
+# Query 2: 13.88 QPS, 0.11x concurrency, ID 0x422390B42D4DD86C7539A5F45EB76A80 at byte 5363
+# This item is included in the report because it matches --limit.
+# Scores: V/M = 0.00
+# Time range: 2023-09-18T10:18:21 to 2023-09-18T10:21:13
+# Attribute    pct   total     min     max     avg     95%  stddev  median
+# ============ === ======= ======= ======= ======= ======= ======= =======
+# Count          5    2388
+# Exec time     27     19s     8ms    26ms     8ms     8ms   418us     8ms
+# Lock time     15   947us       0    10us       0     1us       0       0
+# Rows sent      0   2.33k       1       1       1       1       0       1
+# Rows examine  49 227.75M  97.66k  97.67k  97.66k  97.04k       0  97.04k
+# Query size     1 152.10k      63      66   65.22   65.89    1.33   62.76
+# String:
+# Databases    isuconp
+# Hosts        webapp-app-1.webapp_default
+# Users        root
+# Query_time distribution
+#   1us
+#  10us
+# 100us
+#   1ms  ################################################################
+#  10ms  #
+# 100ms
+#    1s
+#  10s+
+# Tables
+#    SHOW TABLE STATUS FROM `isuconp` LIKE 'comments'\G
+#    SHOW CREATE TABLE `isuconp`.`comments`\G
+# EXPLAIN /*!50100 PARTITIONS*/
+SELECT COUNT(*) AS `count` FROM `comments` WHERE `post_id` = 10000\G
